@@ -1,66 +1,79 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { useEvalAI }       from '@/hooks/useEvalAI';
+import Header              from '@/components/Header';
+import CategoryFilter      from '@/components/CategoryFilter';
+import QuestionCard        from '@/components/QuestionCard';
 
 export default function Home() {
+  const {
+    categories, category, setCategory,
+    question, meta, reference,
+    userAnswer, setUserAnswer,
+    result, loading, evaluating, error,
+    getQuestion, evaluate,
+  } = useEvalAI();
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="max-w-3xl mx-auto px-5 py-12 pb-24 flex flex-col gap-8">
+
+      <Header />
+
+      <CategoryFilter
+        categories={categories}
+        category={category}
+        setCategory={setCategory}
+      />
+
+      {/* Get Question Button */}
+      <div className="flex justify-center">
+        <button
+          id="btn-get-question"
+          onClick={getQuestion}
+          disabled={loading}
+          className="flex items-center gap-2 px-10 py-3.5 rounded-full
+            bg-gradient-to-r from-indigo-500 to-indigo-400 text-white font-semibold text-base
+            shadow-[0_4px_22px_rgba(99,102,241,0.35)]
+            hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(99,102,241,0.5)]
+            disabled:opacity-50 disabled:cursor-not-allowed
+            transition-all duration-200 cursor-pointer min-w-[180px] justify-center"
+        >
+          {loading
+            ? <span className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+            : <><span>🎯</span> Get Question</>
+          }
+        </button>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/25 text-red-300 px-4 py-3 rounded-lg text-sm leading-relaxed">
+          {error}
+        </div>
+      )}
+
+      {/* Question + Answer + Result */}
+      {question && (
+        <QuestionCard
+          question={question}
+          meta={meta}
+          reference={reference}
+          userAnswer={userAnswer}
+          setUserAnswer={setUserAnswer}
+          onSubmit={evaluate}
+          evaluating={evaluating}
+          result={result}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+
+      <footer className="text-center text-[0.76rem] text-slate-600">
+        Powered by{' '}
+        <strong className="text-slate-500">FastAPI</strong> ·{' '}
+        <strong className="text-slate-500">Sentence Transformers</strong> ·{' '}
+        <strong className="text-slate-500">Next.js</strong> +{' '}
+        <strong className="text-slate-500">Tailwind CSS v3</strong>
+      </footer>
+
+    </main>
   );
 }
