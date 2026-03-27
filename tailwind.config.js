@@ -10,12 +10,17 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      spacing: {
+        '68': '17rem',
+      },
       colors: {
-        bg: '#080c17',
-        card: '#0e1525',
-        card2: '#131d30',
+        bg: '#08101e',
+        card: '#101929',
+        card2: '#16233a',
         accent: '#6366f1',
         'accent-light': '#818cf8',
+        'indigo-800': '#3730a3',
+        'indigo-900': '#1e1b4b',
       },
       animation: {
         'fade-up': 'fadeUp 0.4s ease both',
