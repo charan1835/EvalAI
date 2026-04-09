@@ -8,7 +8,8 @@ import {
   Trophy, 
   Settings, 
   LogOut,
-  User
+  User,
+  BrainCircuit
 } from 'lucide-react';
 import { useView } from '@/context/ViewContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,6 +21,7 @@ export default function Sidebar() {
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Mock Interview', icon: <Tv2 size={20} /> },
+    { name: 'AI Quiz', icon: <BrainCircuit size={20} /> },
     { name: 'Practice History', icon: <History size={20} /> },
     { name: 'Questions Bank', icon: <Library size={20} /> },
     { name: 'Leaderboard', icon: <Trophy size={20} /> },
@@ -27,11 +29,11 @@ export default function Sidebar() {
   ];
 
   const handleMenuClick = (name) => {
-    // Enable Dashboard, Mock Interview, and Practice History
-    if (name === 'Dashboard' || name === 'Mock Interview' || name === 'Practice History') {
+    // Enable Dashboard, Mock Interview, Practice History, AI Quiz, and Questions Bank
+    if (['Dashboard', 'Mock Interview', 'Practice History', 'AI Quiz', 'Questions Bank'].includes(name)) {
       setCurrentView(name);
     } else {
-      alert(`${item.name} view is currently in development!`);
+      alert(`${name} view is currently in development!`);
     }
   };
 

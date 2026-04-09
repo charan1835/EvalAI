@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { DEFAULT_CATEGORIES } from '@/lib/constants';
-import { fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory } from '@/lib/api';
+import { 
+  fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory, 
+  fetchAllQuestions, generateAIQuiz 
+} from '@/lib/api';
 
 export function useEvalAI() {
   const [categories, setCategories]   = useState(DEFAULT_CATEGORIES);
@@ -16,6 +19,8 @@ export function useEvalAI() {
   const [loading,    setLoading]      = useState(false);
   const [evaluating, setEvaluating]   = useState(false);
   const [error,      setError]        = useState('');
+  const [allQuestions, setAllQuestions] = useState([]);
+  const [quiz,         setQuiz]         = useState(null);
 
   // Fetch categories and initial history from backend
   useEffect(() => {
@@ -68,8 +73,8 @@ export function useEvalAI() {
         topic: meta?.category || 'General',
         question: question,
         user_answer: userAnswer,
-        score: parseFloat(data.semantic_score || 0),
-        status: data.semantic_score > 8 ? 'Elite' : data.semantic_score > 6 ? 'Passed' : 'Review Needed',
+        score: parseFloat(data.score || 0),
+        status: data.score > 8 ? 'Elite' : data.score > 6 ? 'Passed' : 'Review Needed',
         icon: '📝'
       };
       
@@ -83,11 +88,38 @@ export function useEvalAI() {
     }
   }
 
+  async function getAllQuestions() {
+    setLoading(true);
+    try {
+      const data = await fetchAllQuestions();
+      setAllQuestions(data);
+    } catch (err) {
+      console.error("Failed to fetch all questions:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function startQuiz(topic) {
+    setLoading(true);
+    setError('');
+    setQuiz(null);
+    try {
+      const data = await generateAIQuiz(topic);
+      setQuiz(data);
+    } catch (err) {
+      setError('⚠️ AI Quiz generation failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return {
     categories, category, setCategory,
     question, meta, reference,
     userAnswer, setUserAnswer,
     result, history, loading, evaluating, error,
-    getQuestion, evaluate, getHistory
+    getQuestion, evaluate, getHistory, getAllQuestions, allQuestions,
+    startQuiz, quiz, setQuiz
   };
 }
