@@ -14,9 +14,9 @@ export default function RootLayout({ children }) {
       <body className="flex">
         <ViewProvider>
           <Sidebar />
-          <main className="flex-1 ml-68 min-h-screen relative flex flex-col">
+          <main className="flex-1 ml-68 min-h-screen relative flex flex-col overflow-x-hidden">
             <TopBar />
-            <div className="flex-1 px-12 py-12 no-scrollbar">
+            <div className="flex-1 px-8 py-10 no-scrollbar overflow-x-hidden">
               {children}
             </div>
           </main>

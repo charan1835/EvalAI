@@ -1,6 +1,6 @@
 // Central place for API_BASE, categories, color maps, and helper fns
 
-export const API_BASE = 'http://localhost:8000';
+export const API_BASE = 'http://127.0.0.1:8000';
 
 export const DEFAULT_CATEGORIES = [
   'All',
@@ -19,28 +19,28 @@ export const DEFAULT_CATEGORIES = [
 ];
 
 export const DIFF_STYLE = {
-  Easy:   'text-emerald-400 bg-emerald-500/10 border border-emerald-500/25',
+  Easy: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/25',
   Medium: 'text-amber-400  bg-amber-500/10  border border-amber-500/25',
-  Hard:   'text-red-400    bg-red-500/10    border border-red-500/25',
+  Hard: 'text-red-400    bg-red-500/10    border border-red-500/25',
 };
 
 export const GRADE_COLORS = {
-  green:  {
+  green: {
     ring: '#10b981',
     text: 'text-emerald-400',
-    bg:   'bg-emerald-500/10',
+    bg: 'bg-emerald-500/10',
     border: 'border-emerald-500/25',
   },
   yellow: {
     ring: '#f59e0b',
     text: 'text-amber-400',
-    bg:   'bg-amber-500/10',
+    bg: 'bg-amber-500/10',
     border: 'border-amber-500/25',
   },
   red: {
     ring: '#ef4444',
     text: 'text-red-400',
-    bg:   'bg-red-500/10',
+    bg: 'bg-red-500/10',
     border: 'border-red-500/25',
   },
 };

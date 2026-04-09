@@ -11,9 +11,11 @@ import {
   User
 } from 'lucide-react';
 import { useView } from '@/context/ViewContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
   const { currentView, setCurrentView } = useView();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -25,11 +27,11 @@ export default function Sidebar() {
   ];
 
   const handleMenuClick = (name) => {
-    // For now, only Dashboard and Mock Interview are functional
-    if (name === 'Dashboard' || name === 'Mock Interview') {
+    // Enable Dashboard, Mock Interview, and Practice History
+    if (name === 'Dashboard' || name === 'Mock Interview' || name === 'Practice History') {
       setCurrentView(name);
     } else {
-      alert(`${name} view is currently in development!`);
+      alert(`${item.name} view is currently in development!`);
     }
   };
 
@@ -78,11 +80,11 @@ export default function Sidebar() {
         <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-black shadow-inner">
            <User size={20} />
         </div>
-        <div className="flex flex-col flex-1">
-          <span className="text-[0.8rem] font-black text-white leading-tight">Charan Sai</span>
-          <span className="text-[0.65rem] text-slate-500 font-bold uppercase tracking-widest">Premium Elite</span>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <span className="text-[0.8rem] font-black text-white leading-tight truncate">{user?.name || 'Operator'}</span>
+          <span className="text-[0.65rem] text-slate-500 font-bold uppercase tracking-widest truncate">{user?.tier || 'Pro Elite'}</span>
         </div>
-        <button className="p-2 text-slate-500 hover:text-rose-400 transition-colors">
+        <button onClick={logout} className="p-2 text-slate-500 hover:text-rose-400 transition-colors">
           <LogOut size={16} />
         </button>
       </div>

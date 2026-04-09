@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DEFAULT_CATEGORIES } from '@/lib/constants';
-import { fetchQuestion, submitEvaluation, fetchCategories } from '@/lib/api';
+import { fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory } from '@/lib/api';
 
 export function useEvalAI() {
   const [categories, setCategories]   = useState(DEFAULT_CATEGORIES);
@@ -12,16 +12,28 @@ export function useEvalAI() {
   const [reference,  setReference]    = useState('');
   const [userAnswer, setUserAnswer]   = useState('');
   const [result,     setResult]       = useState(null);
+  const [history,    setHistory]      = useState([]);
   const [loading,    setLoading]      = useState(false);
   const [evaluating, setEvaluating]   = useState(false);
   const [error,      setError]        = useState('');
 
-  // Fetch categories from backend on mount (update pills if backend has more)
+  // Fetch categories and initial history from backend
   useEffect(() => {
     fetchCategories()
       .then(cats => setCategories(['All', ...cats]))
-      .catch(() => {}); // silently fall back to DEFAULT_CATEGORIES
+      .catch(() => {});
+    
+    getHistory();
   }, []);
+
+  async function getHistory() {
+    try {
+      const data = await fetchHistory();
+      setHistory(data);
+    } catch (err) {
+      console.error("Failed to fetch history:", err);
+    }
+  }
 
   async function getQuestion() {
     setLoading(true);
@@ -50,7 +62,21 @@ export function useEvalAI() {
     try {
       const data = await submitEvaluation(reference, userAnswer);
       setResult(data);
-    } catch {
+      
+      // Auto-save to history
+      const historyEntry = {
+        topic: meta?.category || 'General',
+        question: question,
+        user_answer: userAnswer,
+        score: parseFloat(data.semantic_score || 0),
+        status: data.semantic_score > 8 ? 'Elite' : data.semantic_score > 6 ? 'Passed' : 'Review Needed',
+        icon: '📝'
+      };
+      
+      await saveHistory(historyEntry);
+      getHistory(); // Refresh local history
+    } catch (err) {
+      console.error("Evaluation failed:", err);
       setError('⚠️ Evaluation failed. Please try again.');
     } finally {
       setEvaluating(false);
@@ -58,12 +84,10 @@ export function useEvalAI() {
   }
 
   return {
-    // State
     categories, category, setCategory,
     question, meta, reference,
     userAnswer, setUserAnswer,
-    result, loading, evaluating, error,
-    // Actions
-    getQuestion, evaluate,
+    result, history, loading, evaluating, error,
+    getQuestion, evaluate, getHistory
   };
 }
