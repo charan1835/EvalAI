@@ -26,8 +26,13 @@ export async function saveHistory(historyEntry) {
 }
 
 export async function fetchHistory() {
-  const res = await axios.get(`${API_BASE}/history`);
-  return res.data.history;
+  try {
+    const res = await axios.get(`${API_BASE}/history`);
+    return res.data.history;
+  } catch (err) {
+    console.error("AXIOS_FETCH_HISTORY_ERROR:", err.message);
+    throw err;
+  }
 }
 
 export async function requestOTP(email) {

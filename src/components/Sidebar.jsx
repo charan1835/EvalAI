@@ -20,21 +20,17 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Mock Interview', icon: <Tv2 size={20} /> },
-    { name: 'AI Quiz', icon: <BrainCircuit size={20} /> },
+    { name: 'Mock Interview', icon: <Tv2 size={20} />, badge: 'Live' },
+    { name: 'AI Quiz', icon: <BrainCircuit size={20} />, badge: 'Hot' },
     { name: 'Practice History', icon: <History size={20} /> },
     { name: 'Questions Bank', icon: <Library size={20} /> },
-    { name: 'Leaderboard', icon: <Trophy size={20} /> },
+    { name: 'Leaderboard', icon: <Trophy size={20} />, badge: 'Top 10' },
     { name: 'Settings', icon: <Settings size={20} /> },
   ];
 
   const handleMenuClick = (name) => {
-    // Enable Dashboard, Mock Interview, Practice History, AI Quiz, and Questions Bank
-    if (['Dashboard', 'Mock Interview', 'Practice History', 'AI Quiz', 'Questions Bank'].includes(name)) {
-      setCurrentView(name);
-    } else {
-      alert(`${name} view is currently in development!`);
-    }
+    // All views are now accessible, some have placeholders
+    setCurrentView(name);
   };
 
   return (
@@ -61,7 +57,16 @@ export default function Sidebar() {
             <span className={`transition-transform duration-300 ${currentView === item.name ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110'}`}>
                {item.icon}
             </span>
-            <span className="font-bold text-[0.85rem]">{item.name}</span>
+            <span className="font-bold text-[0.85rem] flex-1">{item.name}</span>
+            {item.badge && (
+               <span className={`text-[0.55rem] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${
+                 item.badge === 'Live' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                 item.badge === 'Hot' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
+                 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+               }`}>
+                 {item.badge}
+               </span>
+             )}
           </button>
         ))}
       </nav>
