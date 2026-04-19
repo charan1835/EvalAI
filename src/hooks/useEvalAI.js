@@ -54,7 +54,7 @@ export function useEvalAI() {
       setReference(data.answer);
       setMeta({ category: data.category, difficulty: data.difficulty });
     } catch {
-      setError('⚠️ Could not connect to the backend. Make sure FastAPI is running on port 8000.');
+      setError('⚠️ Could not connect to the backend. Make sure FastAPI is running on port 8080.');
     } finally {
       setLoading(false);
     }

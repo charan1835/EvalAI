@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 // Views
 import LoadingView from '@/components/views/LoadingView';
-import LoginView from '@/components/views/LoginView';
 import DashboardView from '@/components/views/DashboardView';
 import HistoryView from '@/components/views/HistoryView';
 import QuestionBankView from '@/components/views/QuestionBankView';
@@ -17,7 +16,7 @@ import MockInterviewView from '@/components/views/MockInterviewView';
 
 export default function Home() {
    const { currentView, setCurrentView } = useView();
-   const { user, loading: authLoading, authError, login, verify, logout } = useAuth();
+   const { user, logout } = useAuth();
    const {
       categories, category, setCategory,
       question, meta, reference,
@@ -28,10 +27,6 @@ export default function Home() {
    } = useEvalAI();
 
    // Local Component State
-   const [email, setEmail] = useState('');
-   const [otp, setOtp] = useState('');
-   const [step, setStep] = useState('email'); 
-   const [signingIn, setSigningIn] = useState(false);
    const [quizIndex, setQuizIndex] = useState(0);
    const [quizAnswers, setQuizAnswers] = useState({});
    const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -39,28 +34,12 @@ export default function Home() {
    const [quizTimer, setQuizTimer] = useState(0); 
    const [bankSearch, setBankSearch] = useState('');
 
-   // Handlers
-   const handleRequestOTP = async (e) => {
-      e.preventDefault();
-      setSigningIn(true);
-      const success = await login(email);
-      if (success) setStep('otp');
-      setSigningIn(false);
-   };
-
-   const handleVerifyOTP = async (e) => {
-      e.preventDefault();
-      setSigningIn(true);
-      await verify(email, otp);
-      setSigningIn(false);
-   };
-
    // Effects
    useEffect(() => {
       if (currentView === 'Questions Bank') {
          getAllQuestions();
       }
-   }, [currentView]);
+   }, [currentView, getAllQuestions]);
 
    useEffect(() => {
      let interval;
@@ -97,17 +76,7 @@ export default function Home() {
       setQuizTimer(0);
    };
 
-   // Render Logic
-   if (authLoading) return <LoadingView />;
-   
-   if (!user) return (
-      <LoginView 
-         step={step} email={email} setEmail={setEmail} otp={otp} setOtp={setOtp}
-         authError={authError} signingIn={signingIn} setStep={setStep}
-         handleRequestOTP={handleRequestOTP} handleVerifyOTP={handleVerifyOTP}
-      />
-   );
-
+   // Render Logic - Go directly to dashboard
    switch (currentView) {
       case 'Dashboard':
          return <DashboardView user={user} history={history} setCurrentView={setCurrentView} logout={logout} />;

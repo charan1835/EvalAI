@@ -13,6 +13,7 @@ export default function LoginView({
   signingIn, 
   handleRequestOTP, 
   handleVerifyOTP, 
+  handleGuestLogin,
   setStep 
 }) {
   return (
@@ -91,6 +92,26 @@ export default function LoginView({
               </button>
             )}
           </form>
+
+          {step === 'email' && (
+            <div className="mt-6 pt-6 border-t border-white/5">
+              <button
+                type="button"
+                onClick={handleGuestLogin}
+                disabled={signingIn}
+                className="w-full bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 text-slate-300 hover:text-white rounded-2xl py-3 px-5 text-[0.65rem] uppercase tracking-[0.15em] font-black transition-all outline-none focus:ring-4 focus:ring-slate-600/20"
+              >
+                {signingIn ? (
+                  <Loader2 className="animate-spin mx-auto" size={16} />
+                ) : (
+                  'Continue as Guest'
+                )}
+              </button>
+              <p className="text-center mt-3 text-slate-600 text-[0.6rem] font-medium">
+                Limited access • No email required
+              </p>
+            </div>
+          )}
         </div>
 
         <p className="text-center mt-12 text-slate-600 text-[0.6rem] font-black uppercase tracking-widest leading-relaxed">

@@ -35,15 +35,6 @@ export async function fetchHistory() {
   }
 }
 
-export async function requestOTP(email) {
-  const res = await axios.post(`${API_BASE}/auth/request-otp`, { email });
-  return res.data;
-}
-
-export async function verifyOTP(email, otp) {
-  const res = await axios.post(`${API_BASE}/auth/verify-otp`, { email, otp });
-  return res.data;
-}
 
 export async function fetchAllQuestions() {
   const res = await axios.get(`${API_BASE}/questions/all`);
