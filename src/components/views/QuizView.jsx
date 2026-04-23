@@ -240,7 +240,7 @@ export default function QuizView({
 
           <div className="dashboard-card p-10 bg-gradient-to-br from-indigo-500/10 to-transparent border-indigo-500/20">
             <p className="text-[0.7rem] text-slate-400 font-medium leading-loose italic">
-              "Speed and precision are the hallmarks of a senior engineer. This simulation tracks your response time to calibrate your senior-level intuition."
+              &quot;Speed and precision are the hallmarks of a senior engineer. This simulation tracks your response time to calibrate your senior-level intuition.&quot;
             </p>
           </div>
         </div>

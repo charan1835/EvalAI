@@ -2,31 +2,36 @@
 
 import React from 'react';
 import { 
-  Search, ChevronRight, ShieldCheck 
+  Search, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle
 } from 'lucide-react';
 
 export default function QuestionBankView({ 
   allQuestions, 
-  loading, 
+  loading,
+  error,
   bankSearch, 
   setBankSearch, 
-  setCurrentView 
+  setCurrentView,
+  onRetry
 }) {
-  // Filter questions by search
   const filteredQuestions = allQuestions.filter(q => 
-     (q?.question?.toLowerCase()?.includes(bankSearch.toLowerCase())) || 
-     (q?.category?.toLowerCase()?.includes(bankSearch.toLowerCase()))
+    (q?.question?.toLowerCase()?.includes(bankSearch.toLowerCase())) || 
+    (q?.category?.toLowerCase()?.includes(bankSearch.toLowerCase()))
   );
 
-  // Group questions by category
   const grouped = filteredQuestions.reduce((acc, q) => {
-     if (!acc[q.category]) acc[q.category] = [];
-     acc[q.category].push(q);
-     return acc;
+    if (!acc[q.category]) acc[q.category] = [];
+    acc[q.category].push(q);
+    return acc;
   }, {});
+
+  const isLoaded   = allQuestions.length > 0;
+  const hasResults = Object.keys(grouped).length > 0;
 
   return (
     <div className="animate-fade-up max-w-[1600px] mx-auto pb-24 px-4">
+
+      {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-12">
         <div>
           <h2 className="text-4xl font-black text-white tracking-tighter mb-2">Internal Intelligence Bank</h2>
@@ -44,16 +49,61 @@ export default function QuestionBankView({
               className="w-full bg-white/[0.02] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-white text-xs font-bold placeholder:text-slate-700 focus:border-indigo-500/50 outline-none transition-all"
             />
           </div>
-          <button onClick={() => setCurrentView('Dashboard')} className="glass-button text-[0.65rem] font-black uppercase tracking-widest px-8 py-3 whitespace-nowrap">Exit Bank</button>
+          <button
+            onClick={() => setCurrentView('Dashboard')}
+            className="glass-button text-[0.65rem] font-black uppercase tracking-widest px-8 py-3 whitespace-nowrap"
+          >
+            Exit Bank
+          </button>
         </div>
       </div>
 
+      {/* Error banner with retry */}
+      {error && (
+        <div className="dashboard-card flex items-center justify-between gap-6 p-8 bg-rose-500/5 border-rose-500/20 mb-8">
+          <div className="flex items-center gap-5">
+            <div className="w-12 h-12 bg-rose-500/10 rounded-2xl flex items-center justify-center text-rose-400 flex-shrink-0">
+              <AlertTriangle size={22} />
+            </div>
+            <div>
+              <p className="text-rose-300 font-black text-sm">{error}</p>
+              <p className="text-slate-500 text-xs font-medium mt-1">Make sure the backend is running on <code className="text-indigo-400">localhost:8000</code></p>
+            </div>
+          </div>
+          <button
+            onClick={onRetry}
+            className="glass-button flex items-center gap-2 text-[0.65rem] font-black uppercase tracking-widest px-6 py-3 hover:border-indigo-500/40 whitespace-nowrap"
+          >
+            <RefreshCw size={14} /> Retry
+          </button>
+        </div>
+      )}
+
+      {/* Loading spinner */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-6">
           <div className="w-16 h-16 border-t-2 border-indigo-500 rounded-full animate-spin" />
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[0.6rem]">Decrypting Database...</p>
         </div>
-      ) : Object.keys(grouped).length > 0 ? (
+
+      ) : !isLoaded && !error ? (
+        /* Initial state — not yet fetched */
+        <div className="dashboard-card py-40 border-dashed border-slate-800 bg-transparent flex flex-col items-center justify-center text-center">
+          <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center text-slate-600 mb-8 border border-white/5">
+            <Search size={32} />
+          </div>
+          <h3 className="text-2xl font-black text-slate-600 tracking-tight uppercase mb-3">Loading Intelligence Bank</h3>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[0.65rem] max-w-xs mb-8">Connecting to backend to retrieve question database...</p>
+          <button
+            onClick={onRetry}
+            className="glass-button flex items-center gap-2 text-[0.65rem] font-black uppercase tracking-widest px-8 py-3 hover:border-indigo-500/40"
+          >
+            <RefreshCw size={14} /> Load Questions
+          </button>
+        </div>
+
+      ) : hasResults ? (
+        /* Questions list */
         <div className="space-y-16">
           {Object.entries(grouped).map(([cat, qs]) => (
             <div key={cat} className="animate-fade-up">
@@ -113,7 +163,9 @@ export default function QuestionBankView({
             </div>
           ))}
         </div>
+
       ) : (
+        /* No search results */
         <div className="dashboard-card py-40 border-dashed border-slate-800 bg-transparent flex flex-col items-center justify-center text-center">
           <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center text-slate-800 mb-8 border border-white/5">
             <Search size={32} />

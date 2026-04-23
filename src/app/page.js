@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import { useEvalAI } from '@/hooks/useEvalAI';
 import { useView } from '@/context/ViewContext';
 import { useAuth } from '@/hooks/useAuth';
+import { saveQuizHistory } from '@/lib/api';
 
 // Views
 import LoadingView from '@/components/views/LoadingView';
+import LoginView from '@/components/views/LoginView';
 import DashboardView from '@/components/views/DashboardView';
 import HistoryView from '@/components/views/HistoryView';
 import QuestionBankView from '@/components/views/QuestionBankView';
@@ -16,13 +18,20 @@ import MockInterviewView from '@/components/views/MockInterviewView';
 
 export default function Home() {
    const { currentView, setCurrentView } = useView();
-   const { user, logout } = useAuth();
+   const {
+     user, loading: authLoading, signingIn, authError,
+     step, setStep, email, setEmail, otp, setOtp,
+     handleRequestOTP, handleVerifyOTP, handleGuestLogin,
+     logout,
+   } = useAuth();
+
    const {
       categories, category, setCategory,
       question, meta, reference,
       userAnswer, setUserAnswer,
       result, history, loading, evaluating, error,
-      getQuestion, evaluate, getAllQuestions, allQuestions,
+      getQuestion, evaluate, getHistory, getAllQuestions, allQuestions,
+      bankLoading, bankError,
       startQuiz, quiz, setQuiz
    } = useEvalAI();
 
@@ -34,12 +43,12 @@ export default function Home() {
    const [quizTimer, setQuizTimer] = useState(0); 
    const [bankSearch, setBankSearch] = useState('');
 
-   // Effects
+   // Retry fetching questions bank on navigation if it failed on mount
    useEffect(() => {
-      if (currentView === 'Questions Bank') {
+      if (currentView === 'Questions Bank' && allQuestions.length === 0) {
          getAllQuestions();
       }
-   }, [currentView, getAllQuestions]);
+   }, [currentView, getAllQuestions, allQuestions.length]);
 
    useEffect(() => {
      let interval;
@@ -58,13 +67,26 @@ export default function Home() {
      return `${m}:${s < 10 ? '0' : ''}${s}`;
    };
 
-   const handleQuizSubmit = () => {
-      let score = 0;
-      quiz.questions.forEach((q, idx) => {
-         if (quizAnswers[idx] === q.answer) score++;
-      });
+   const handleQuizSubmit = async () => {
+      const score = quiz.questions.filter(
+        (q, i) => quizAnswers[i] === q.answer
+      ).length;
       setQuizScore(score);
       setQuizSubmitted(true);
+
+      // Save full quiz result as a single history entry
+      try {
+        await saveQuizHistory({
+          topic: quiz.topic,
+          score,
+          total: quiz.questions.length,
+          questions: quiz.questions,
+          quizAnswers,
+        });
+        getHistory(); // Refresh history panel
+      } catch (err) {
+        console.error('Failed to save quiz history:', err);
+      }
    };
 
    const resetQuiz = () => {
@@ -76,7 +98,32 @@ export default function Home() {
       setQuizTimer(0);
    };
 
-   // Render Logic - Go directly to dashboard
+   // --- AUTH GATE ---
+   // Show spinner while checking localStorage for existing session
+   if (authLoading) {
+      return <LoadingView />;
+   }
+
+   // Show login screen if not authenticated
+   if (!user) {
+      return (
+         <LoginView
+            step={step}
+            email={email}
+            setEmail={setEmail}
+            otp={otp}
+            setOtp={setOtp}
+            authError={authError}
+            signingIn={signingIn}
+            handleRequestOTP={handleRequestOTP}
+            handleVerifyOTP={handleVerifyOTP}
+            handleGuestLogin={handleGuestLogin}
+            setStep={setStep}
+         />
+      );
+   }
+
+   // --- MAIN APP (authenticated) ---
    switch (currentView) {
       case 'Dashboard':
          return <DashboardView user={user} history={history} setCurrentView={setCurrentView} logout={logout} />;
@@ -96,10 +143,10 @@ export default function Home() {
 
       case 'Questions Bank':
          return (
-            <QuestionBankView 
-               allQuestions={allQuestions} loading={loading} 
-               bankSearch={bankSearch} setBankSearch={setBankSearch} 
-               setCurrentView={setCurrentView} 
+            <QuestionBankView
+               allQuestions={allQuestions} loading={bankLoading} error={bankError}
+               bankSearch={bankSearch} setBankSearch={setBankSearch}
+               setCurrentView={setCurrentView} onRetry={getAllQuestions}
             />
          );
 

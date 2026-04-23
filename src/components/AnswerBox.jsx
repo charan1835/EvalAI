@@ -7,7 +7,11 @@ export default function AnswerBox({ value, onChange, onSubmit, loading, disabled
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
-  // Initialize Speech Recognition
+  // Keep a ref to the latest onChange to avoid stale closures in speech callbacks
+  const onChangeRef = useRef(onChange);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
+  // Initialize Speech Recognition only once on mount
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -23,7 +27,7 @@ export default function AnswerBox({ value, onChange, onSubmit, loading, disabled
         }
         // Append or set the transcript depending on preference. Here we append with a space.
         if (event.results[event.results.length - 1].isFinal) {
-          onChange((prev) => (prev ? prev + ' ' + transcript : transcript));
+          onChangeRef.current((prev) => (prev ? prev + ' ' + transcript : transcript));
         }
       };
 
@@ -42,7 +46,7 @@ export default function AnswerBox({ value, onChange, onSubmit, loading, disabled
         recognitionRef.current.stop();
       }
     };
-  }, [onChange]);
+  }, []);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {

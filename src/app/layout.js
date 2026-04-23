@@ -1,25 +1,24 @@
 import './globals.css';
-import Sidebar from '@/components/Sidebar';
-import TopBar from '@/components/TopBar';
 import { ViewProvider } from '@/context/ViewContext';
+import AppShell from '@/components/AppShell';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'EvalAI | Software Interview Dashboard',
-  description: 'AI-Powered NLP Software Interview Practice Platform',
+  title: 'EvalAI — Advanced AI Software Interview Platform',
+  description: 'Master your technical interviews with EvalAI. AI-powered semantic evaluation, mock simulations, and real-time feedback using Gemini 2.5.',
+  keywords: 'software interview, ai mock interview, technical prep, gemini ai, coding interview practice',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="flex">
+      <body className={inter.className}>
         <ViewProvider>
-          <Sidebar />
-          <main className="flex-1 ml-68 min-h-screen relative flex flex-col overflow-x-hidden">
-            <TopBar />
-            <div className="flex-1 px-8 py-10 no-scrollbar overflow-x-hidden">
-              {children}
-            </div>
-          </main>
+          <AppShell>
+            {children}
+          </AppShell>
         </ViewProvider>
       </body>
     </html>

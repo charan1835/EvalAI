@@ -79,7 +79,7 @@ export default function Sidebar() {
            <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden mb-3 border border-white/5">
              <div className="h-full bg-white w-[85%] rounded-full shadow-[0_0_10px_rgba(255,255,255,0.4)] transition-all duration-1000" />
            </div>
-           <p className="text-white/80 text-[0.7rem] font-medium leading-tight">You're in the top 5% of users this week!</p>
+           <p className="text-white/80 text-[0.7rem] font-medium leading-tight">You&apos;re in the top 5% of users this week!</p>
         </div>
       </div>
 

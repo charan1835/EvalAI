@@ -13,7 +13,11 @@ export default function DashboardView({
 }) {
   const stats = [
     { label: 'Total Sessions', value: history.length.toString(), icon: <Award className="text-white" />, color: 'bg-indigo-500', shadow: 'shadow-indigo-500/20' },
-    { label: 'Avg score', value: history.length > 0 ? (history.reduce((acc, h) => acc + h.score, 0) / history.length).toFixed(1) : '0.0', icon: <Target className="text-white" />, color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
+    { label: 'Avg Accuracy', value: history.length > 0 ? (history.reduce((acc, h) => {
+      // If it's a quiz, use percentage; if interview, use score (which is 0-100)
+      const val = h.type === 'quiz' ? (h.percentage ?? (h.score * 10)) : h.score;
+      return acc + val;
+    }, 0) / history.length).toFixed(1) + '%' : '0.0%', icon: <Target className="text-white" />, color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
     { label: 'Domains', value: new Set(history.map(h => h.topic)).size.toString(), icon: <Zap className="text-white" />, color: 'bg-amber-500', shadow: 'shadow-amber-500/20' },
     { label: 'Last Active', value: history.length > 0 ? history[0].date?.split(' ')[0] : 'Never', icon: <Clock className="text-white" />, color: 'bg-slate-500', shadow: 'shadow-slate-500/20' },
   ];
@@ -85,7 +89,9 @@ export default function DashboardView({
                       {item.icon}
                     </div>
                     <div className="max-w-[400px]">
-                      <h5 className="text-slate-100 font-black group-hover:text-indigo-400 transition-colors uppercase tracking-tight text-sm truncate">{item.topic}: {item.question}</h5>
+                      <h5 className="text-slate-100 font-black group-hover:text-indigo-400 transition-colors uppercase tracking-tight text-sm truncate">
+                        {item.topic}: {item.type === 'quiz' ? 'AI Quiz Session' : item.question}
+                      </h5>
                       <p className="text-slate-500 text-[0.65rem] font-black uppercase tracking-widest mt-1 opacity-70">{item.date}</p>
                     </div>
                   </div>
@@ -139,7 +145,7 @@ export default function DashboardView({
           <div className="dashboard-card border-white/5 bg-white/[0.01] p-8">
             <h4 className="text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"><Cpu size={14} /> System Health</h4>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-slate-400">NLP Engine v1.2</span>
+              <span className="text-xs font-bold text-slate-400">Gemini 2.5 Neural Engine</span>
               <span className="text-[0.6rem] text-emerald-400 font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Active</span>
             </div>
             <div className="flex items-center justify-between">

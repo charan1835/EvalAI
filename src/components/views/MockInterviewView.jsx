@@ -142,11 +142,11 @@ export default function MockInterviewView({
             <ul className="text-[0.75rem] text-slate-400 space-y-6">
               <li className="flex gap-4">
                 <span className="text-indigo-500 font-black bg-indigo-500/10 w-5 h-5 flex items-center justify-center rounded-md flex-shrink-0">1</span>
-                <p className="italic font-medium leading-relaxed">Prioritize systemic "Trade-off" analysis in your answers.</p>
+                <p className="italic font-medium leading-relaxed">Prioritize systemic &quot;Trade-off&quot; analysis in your answers.</p>
               </li>
               <li className="flex gap-4">
                 <span className="text-indigo-500 font-black bg-indigo-500/10 w-5 h-5 flex items-center justify-center rounded-md flex-shrink-0">2</span>
-                <p className="italic font-medium leading-relaxed">Articulate "Scalability" vectors when designing components.</p>
+                <p className="italic font-medium leading-relaxed">Articulate &quot;Scalability&quot; vectors when designing components.</p>
               </li>
             </ul>
           </div>

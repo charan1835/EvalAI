@@ -88,7 +88,7 @@ export default function ResultPanel({ result = {}, reference }) {
             </div>
             <div className="bg-slate-950/50 rounded-2xl p-6 border border-white/5 italic">
                <p className="text-slate-300 text-[0.95rem] leading-relaxed">
-                 "{analysis.perfect_answer}"
+                 &quot;{analysis.perfect_answer}&quot;
                </p>
             </div>
          </div>

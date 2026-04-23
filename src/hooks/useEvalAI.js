@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { DEFAULT_CATEGORIES } from '@/lib/constants';
 import { 
   fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory, 
@@ -20,16 +20,19 @@ export function useEvalAI() {
   const [evaluating, setEvaluating]   = useState(false);
   const [error,      setError]        = useState('');
   const [allQuestions, setAllQuestions] = useState([]);
+  const [bankLoading,  setBankLoading]  = useState(false);
+  const [bankError,    setBankError]    = useState('');
   const [quiz,         setQuiz]         = useState(null);
 
-  // Fetch categories and initial history from backend
+  // Pre-fetch everything on mount so views are ready immediately
   useEffect(() => {
     fetchCategories()
       .then(cats => setCategories(['All', ...cats]))
       .catch(() => {});
     
     getHistory();
-  }, []);
+    getAllQuestions(); // pre-load question bank in background
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function getHistory() {
     try {
@@ -54,7 +57,7 @@ export function useEvalAI() {
       setReference(data.answer);
       setMeta({ category: data.category, difficulty: data.difficulty });
     } catch {
-      setError('⚠️ Could not connect to the backend. Make sure FastAPI is running on port 8080.');
+      setError('⚠️ Could not connect to the backend. Make sure the API is reachable.');
     } finally {
       setLoading(false);
     }
@@ -88,31 +91,41 @@ export function useEvalAI() {
     }
   }
 
-  async function getAllQuestions() {
-    setLoading(true);
+  // Dedicated loading/error state for Questions Bank (isolated from shared loading)
+  const getAllQuestions = useCallback(async () => {
+    setBankLoading(true);
+    setBankError('');
     try {
       const data = await fetchAllQuestions();
       setAllQuestions(data);
     } catch (err) {
-      console.error("Failed to fetch all questions:", err);
+      console.error('Failed to fetch all questions:', err);
+      setBankError('Could not load questions. Is the backend running?');
     } finally {
-      setLoading(false);
+      setBankLoading(false);
     }
-  }
+  }, []);
 
-  async function startQuiz(topic) {
+  const startQuiz = useCallback(async (topic) => {
     setLoading(true);
     setError('');
     setQuiz(null);
     try {
       const data = await generateAIQuiz(topic);
-      setQuiz(data);
+      // data is the full response: { status, topic, questions }
+      if (!data || !Array.isArray(data.questions)) {
+        setError('⚠️ Quiz generation returned invalid data. Please try again.');
+        return;
+      }
+      // Store the full object so quiz.topic and quiz.questions both work
+      setQuiz({ topic: data.topic, questions: data.questions });
     } catch (err) {
-      setError('⚠️ AI Quiz generation failed. Please try again.');
+      const detail = err?.response?.data?.detail;
+      setError(detail || '⚠️ AI Quiz generation failed. Please try again.');
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   return {
     categories, category, setCategory,
@@ -120,6 +133,7 @@ export function useEvalAI() {
     userAnswer, setUserAnswer,
     result, history, loading, evaluating, error,
     getQuestion, evaluate, getHistory, getAllQuestions, allQuestions,
+    bankLoading, bankError,
     startQuiz, quiz, setQuiz
   };
 }
