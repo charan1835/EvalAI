@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DEFAULT_CATEGORIES } from '@/lib/constants';
+import { DEMO_HISTORY } from '@/lib/demoData';
 import { 
   fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory, 
   fetchAllQuestions, generateAIQuiz 
@@ -37,9 +38,11 @@ export function useEvalAI() {
   async function getHistory() {
     try {
       const data = await fetchHistory();
-      setHistory(data);
+      // If DB is disconnected or empty, show demo data so dashboard looks populated
+      setHistory(data && data.length > 0 ? data : DEMO_HISTORY);
     } catch (err) {
-      console.error("Failed to fetch history:", err);
+      console.error("Failed to fetch history — using demo data:", err);
+      setHistory(DEMO_HISTORY);
     }
   }
 
