@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DEFAULT_CATEGORIES } from '@/lib/constants';
-import { DEMO_HISTORY } from '@/lib/demoData';
+import { DEMO_HISTORY, DEMO_QUESTIONS } from '@/lib/demoData';
 import { 
   fetchQuestion, submitEvaluation, fetchCategories, saveHistory, fetchHistory, 
   fetchAllQuestions, generateAIQuiz 
@@ -100,10 +100,12 @@ export function useEvalAI() {
     setBankError('');
     try {
       const data = await fetchAllQuestions();
-      setAllQuestions(data);
+      // Fall back to demo questions if backend returns nothing
+      setAllQuestions(data && data.length > 0 ? data : DEMO_QUESTIONS);
     } catch (err) {
-      console.error('Failed to fetch all questions:', err);
-      setBankError('Could not load questions. Is the backend running?');
+      console.error('Failed to fetch all questions — using demo data:', err);
+      setAllQuestions(DEMO_QUESTIONS);
+      // Don't set bankError so the demo data renders cleanly
     } finally {
       setBankLoading(false);
     }

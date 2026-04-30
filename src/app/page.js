@@ -15,6 +15,7 @@ import QuestionBankView from '@/components/views/QuestionBankView';
 import QuizView from '@/components/views/QuizView';
 import PlaceholderView from '@/components/views/PlaceholderView';
 import MockInterviewView from '@/components/views/MockInterviewView';
+import LeaderboardView from '@/components/views/LeaderboardView';
 
 export default function Home() {
    const { currentView, setCurrentView } = useView();
@@ -161,6 +162,8 @@ export default function Home() {
          );
 
       case 'Leaderboard':
+         return <LeaderboardView setCurrentView={setCurrentView} user={user} />;
+
       case 'Settings':
          return <PlaceholderView currentView={currentView} setCurrentView={setCurrentView} />;
 
